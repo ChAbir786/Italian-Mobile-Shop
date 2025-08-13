@@ -1,137 +1,402 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mobile Repair Shop</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Italian Mobile Shop</title>
+  <meta name="description" content="Fast & Reliable Mobile Repair Services. Shop the latest mobile accessories and devices." />
+  <meta name="keywords" content="mobile, repair, accessories, smartphones, smartwatches, earbuds, power bank" />
+  <meta name="author" content="Italian Mobile Shop" />
+  <link rel="icon" href="Products/titlelogo.avif" type="image/x-icon">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #111;
-      color: white;
+    :root{
+      --bg:#0d1117; --panel:#1f2937; --panel-2:#374151; --text:#f0f0f0; --brand:#10b981; --primary:#3b82f6; --danger:#ef4444;
     }
-    header {
-      background: #222;
-      color: white;
-      text-align: center;
-      padding: 20px;
-      font-size: 24px;
-    }
-    nav {
-      display: flex;
-      justify-content: center;
-      background: #333;
-      padding: 15px;
-    }
-    nav a {
-      color: white;
-      text-decoration: none;
-      padding: 15px 25px;
-      font-size: 18px;
-      transition: 0.3s;
-    }
-    nav a:hover {
-      background: #444;
-    }
-    .container {
-      width: 80%;
-      margin: auto;
-      overflow: hidden;
-      padding: 30px;
-      background: #222;
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-      margin-top: 30px;
-      border-radius: 10px;
-    }
-    .poster {
-      width: 300px;
-      height: auto;
-      border-radius: 10px;
-      margin: 20px auto;
-      display: block;
-    }
+    *{box-sizing:border-box}
+    body { margin: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background-color: var(--bg); color: var(--text); padding-bottom: 70px; }
+    header, nav, footer { background-color: var(--panel); padding: 15px 20px; text-align: center; }
+    nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; align-items:center }
+    nav a { color: white; text-decoration: none; font-weight: 600; }
+    nav a:hover { color: var(--brand); }
+    .container { max-width: 1200px; margin: 30px auto; padding: 0 15px; }
+    .products { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+    .product-box{ background: var(--panel); padding: 15px; border-radius: 12px; text-align: center; transition: all 0.25s ease; box-shadow: 0 4px 18px rgba(0,0,0,.15) }
+    .product-box:hover{ background: var(--panel-2); transform: translateY(-4px); }
+    .product-box img { width: 100%; height: 180px; object-fit: cover; border-radius: 10px; margin-bottom: 10px; }
+    .price { color: var(--brand); font-weight: 800; }
+    .btn { background-color: var(--primary); border: none; padding: 10px 15px; color: white; border-radius: 8px; cursor: pointer; font-weight:700 }
+    .btn:hover { filter: brightness(1.1); }
+    .cart-summary { background: var(--panel); padding: 20px; margin-top: 40px; border-radius: 12px; }
+    .cart-item { display: flex; justify-content: space-between; margin-bottom: 8px; gap:10px; align-items:center }
+    .remove-btn { background: var(--danger); color: white; border: none; padding: 2px 8px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+    .remove-btn:hover { filter: brightness(0.95); }
+    .cart-icon { position: relative; cursor: pointer; }
+    .cart-count { position: absolute; top: -8px; right: -8px; background: var(--brand); color: white; border-radius: 50%; font-size: 12px; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+    .sticky-checkout { position: fixed; bottom: 0; left: 0; right: 0; background: var(--panel); padding: 10px 20px; display: none; justify-content: space-between; align-items: center; z-index: 1000; border-top: 2px solid var(--brand); gap:10px }
+    .sticky-checkout button { padding: 10px 20px; background: var(--brand); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    .sidebar-toggle { position: fixed; top: 20px; left: 20px; z-index: 1001; background: #007BFF; color: white; border: none; border-radius: 8px; padding: 10px 12px; cursor: pointer; box-shadow:0 6px 20px rgba(0,0,0,.25) }
+    .sidebar { width: 220px; background: #111; color: white; position: fixed; height: 100vh; top: 0; left: -220px; transition: left 0.3s ease; padding-top: 60px; padding-left: 20px; display: flex; flex-direction: column; gap: 15px; z-index: 1000; }
+    .sidebar.show { left: 0; }
+    .sidebar a { color: white; text-decoration: none; }
+    .sidebar a:hover { color: #00bcd4; }
 
-    .services {
-      display: flex;
-      justify-content: space-around;
-      flex-wrap: wrap;
-      margin-top: 30px;
-    }
-    .service-box {
-      background: #333;
-      padding: 20px;
-      width: 30%;
-      text-align: center;
-      border-radius: 10px;
-      transition: transform 0.3s, background 0.3s;
-      margin-bottom: 20px;
-    }
-    .service-box:hover {
-      transform: scale(1.05);
-      background: #444;
-    }
-    footer {
-      text-align: center;
-      padding: 15px;
-      background: #222;
-      color: white;
-      margin-top: 30px;
-    }
-    button {
-      display: block;
-      margin: 20px auto;
-      padding: 15px 25px;
-      background: #28a745;
-      color: white;
-      font-size: 18px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    button:hover {
-      background: #218838;
+    /* Modal */
+    .modal{ position: fixed; inset:0; background: rgba(0,0,0,.6); display:none; align-items:center; justify-content:center; z-index:2000 }
+    .modal.open{ display:flex }
+    .modal-card{ background: #0e1726; width: 95%; max-width: 720px; border-radius: 16px; padding: 20px; box-shadow: 0 10px 40px rgba(0,0,0,.5) }
+    .modal-header{ display:flex; justify-content:space-between; align-items:center; gap:10px }
+    .close{ background:transparent; border:none; color:#fff; font-size:24px; cursor:pointer }
+    .divider{ height:1px; background:#223046; margin:12px 0 }
+    .muted{ color:#b9c4d0; font-size:14px }
+    input, .select, textarea{ width:100%; padding:10px 12px; border-radius:10px; border:1px solid #243245; background:#0a1220; color:#eaf2ff }
+    label{ display:block; margin:8px 0 6px; font-weight:600 }
+    .grid-2{ display:grid; grid-template-columns: 1fr 1fr; gap:12px }
+    .pill{ display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; background:#112036; font-size:12px }
+
+    @media(max-width: 600px){
+      .product-box img { height: 150px; }
+      .grid-2{ grid-template-columns: 1fr }
     }
   </style>
 </head>
 <body>
+  <button class="sidebar-toggle" onclick="toggleSidebar()">☰ Menu</button>
+  <div class="sidebar" id="sidebar">
+    <a href="#">Home</a>
+    <a href="#services">Services</a>
+    <a href="#contact">Contact Us</a> 
+  </div>
+  
   <header>
     <h1>Italian Mobile Shop</h1>
     <p>Fast & Reliable Mobile Repair Services</p>
+    <div id="authState" class="muted"></div>
   </header>
+  
   <nav>
-    <a href="#">Home</a>
-    <a href="sevices.html">Services</a>
-    <a href="contact.html">Contact</a>
+    <a href="#hot">Hot Products</a>
+    <a href="#smart-watches">Smart Watches</a>
+    <a href="#phones">Phones</a>
+    <a href="#mics">Mics</a>
+    <a href="#youtube-studio">YouTube Studio</a>
+    <div class="cart-icon" onclick="scrollToCart()">
+      <img src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png" width="30" alt="Cart" />
+      <div class="cart-count" id="cart-count">0</div>
+    </div>
   </nav>
-  <div class="container">
-    <img src="poster.png" alt="Portrait Poster" class="poster">
-    <h2>Our Services</h2>
-    <div class="services">
-      <div class="service-box">
-        <h3>Screen Repair</h3>
-        <p>We fix broken screens quickly and affordably.</p>
+
+  <div class="container" id="hot">
+    <h2>🔥 Hot Products</h2>
+    <div class="products" id="products-list">
+      <!-- NEW: Digital product card (Prompt Pack) -->
+      <div class="product-box">
+        <img src="products/ai-prompts.jpg" alt="AI Prompt Bundle – 50+ Must-Have Prompts" onerror="this.src='https://picsum.photos/seed/aiprompt/600/400'" />
+        <h3>AI Prompt Bundle – 70+ Pro Prompts (PDF)</h3>
+        <p class="muted">Tech Guide by Abir • Instant download</p>
+        <p class="price">Rs. 199</p>
+        <button class="btn" onclick="addToCart('AI Prompt Bundle – 70+ Pro Prompts (PDF)', 199, true)">Add to Cart</button>
       </div>
-      <div class="service-box">
-        <h3>Battery Replacement</h3>
-        <p>Replace old batteries for better performance.</p>
+
+      <!-- Existing physical examples -->
+      <div class="product-box">
+        <img src="products/micpic2.jpg" alt="ORIGINAL BM800 Condenser Microphone KIT" />
+        <h3>ORIGINAL BM800 Condenser Microphone KIT</h3>
+        <p class="price">Rs. 1000</p>
+        <button class="btn" onclick="addToCart('ORIGINAL BM800 Condenser Microphone KIT', 1000)">Add to Cart</button>
       </div>
-      <div class="service-box">
-        <h3>Software Issues</h3>
-        <p>Fix software problems and improve your device.</p>
+      <div class="product-box">
+        <img src="products/7+.jpg" alt="Iphone 7 Plus" />
+        <h3>Iphone 7 Plus</h3>
+        <p class="price">Rs. 1100</p>
+        <button class="btn" onclick="addToCart('Iphone 7 Plus', 1100)">Add to Cart</button>
+      </div>
+      <div class="product-box">
+        <img src="products/airpods.jpg" alt="Bluetooth Earbuds" />
+        <h3>Bluetooth Earbuds</h3>
+        <p class="price">Rs. 2300</p>
+        <button class="btn" onclick="addToCart('Bluetooth Earbuds', 2300)">Add to Cart</button>
+      </div>
+      <div class="product-box">
+        <img src="products/5in1watch.jpg" alt="5in1 Ultra Smart Watch" />
+        <h3>5in1 Ultra Smart Watch</h3>
+        <p class="price">Rs. 1500</p>
+        <button class="btn" onclick="addToCart('5in1 Ultra Smart Watch', 1500)">Add to Cart</button>
+      </div>
+      <div class="product-box">
+        <img src="products/powerbank.jpg" alt="Power Bank" />
+        <h3>Power Bank</h3>
+        <p class="price">Rs. 1200</p>
+        <button class="btn" onclick="addToCart('Power Bank', 1200)">Add to Cart</button>
+      </div>
+      <div class="product-box">
+        <img src="products/cooling fan.jpg" alt="CoolPad for Phones" />
+        <h3>CoolPad for Phones</h3>
+        <p class="price">Rs. 800</p>
+        <button class="btn" onclick="addToCart('CoolPad for Phones', 800)">Add to Cart</button>
       </div>
     </div>
-    <button onclick="showAlert()">Click for Discount</button>
+
+    <div class="cart-summary" id="cart" style="display:none;">
+      <h2>Cart Summary</h2>
+      <div id="cart-items"></div>
+      <p><strong>Total:</strong> Rs. <span id="cart-total">0</span></p>
+    </div>
   </div>
+
+  <div class="sticky-checkout" id="checkout-bar">
+    <span>Total: Rs. <span id="sticky-total">0</span></span>
+    <button onclick="openCheckout()">Checkout</button>
+  </div>
+
   <footer>
-    <p>&copy; 2025 Mobile Repair Shop. All Rights Reserved.</p>
+    <p>&copy; 2025 Italian Mobile Shop. All Rights Reserved.</p>
   </footer>
+
+  <!-- Checkout Modal -->
+  <div class="modal" id="checkoutModal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Checkout</h3>
+        <button class="close" onclick="closeCheckout()">×</button>
+      </div>
+      <div class="divider"></div>
+
+      <div id="userBox" class="pill" style="margin-bottom:8px"></div>
+
+      <div>
+        <h4>Your Items</h4>
+        <div id="checkout-items" class="muted" style="margin-top:6px"></div>
+        <p style="margin-top:8px"><strong>Total:</strong> Rs. <span id="checkout-total">0</span></p>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="grid-2">
+        <div>
+          <h4>Payment Method</h4>
+          <label for="payMethod">Choose</label>
+          <select id="payMethod" class="select">
+            <option value="easypaisa">Easypaisa</option>
+            <option value="jazzcash">JazzCash</option>
+            <option value="bank">Bank Transfer</option>
+            <option value="cod">Cash (In‑Store)</option>
+          </select>
+          <p class="muted" style="margin-top:8px">Pay to: <strong id="merchantLine">Account will show after Sign‑In</strong></p>
+        </div>
+        <div>
+          <h4>After Payment</h4>
+          <label for="txnId">Transaction ID</label>
+          <input id="txnId" placeholder="e.g., TID8XY123" />
+          <label for="buyerEmail">Email (to receive receipt)</label>
+          <input id="buyerEmail" type="email" placeholder="you@example.com" />
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div>
+        <button class="btn" id="signBtn" onclick="signInWithGoogle()">Sign in with Google</button>
+        <button class="btn" style="background:var(--brand)" onclick="verifyAndUnlock()">I have paid – Unlock Downloads</button>
+      </div>
+
+      <div id="unlockBox" style="display:none; margin-top:16px">
+        <div class="divider"></div>
+        <h4>Downloads</h4>
+        <p class="muted">Thanks for your purchase! Click to download your files:</p>
+        <ul id="downloadList"></ul>
+      </div>
+
+      <p class="muted" style="margin-top:12px">Note: This is an MVP flow using manual payment confirmation. For auto‑verification, connect a payment gateway or use admin approval in Firestore.</p>
+    </div>
+  </div>
+
+  <!-- Firebase v8 compat scripts -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
   <script>
-    function showAlert() {
-      alert("Get 10% off on your first repair!");
+    // =====================
+    //  FIREBASE CONFIG
+    //  Replace with your v8 (compat) config from Firebase console
+    // =====================
+    
+    
+    const firebaseConfig = {
+      apiKey: "AIzaSyAgCulSOvdbYZdLNUjBCxN_1rfttwQ_Rv4",
+      authDomain: "tech-store-1943d.firebaseapp.com",
+      projectId: "tech-store-1943d",
+      // If you also want Storage links, add storageBucket too
+      storageBucket: "tech-store-1943d.firebasestorage.app",
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // =====================
+    //  APP STATE
+    // =====================
+    let cart = []; // {name, price, isDigital}
+    let total = 0;
+    let currentUser = null;
+
+    const cartItemsDiv = document.getElementById('cart-items');
+    const cartTotalSpan = document.getElementById('cart-total');
+    const cartCountDiv = document.getElementById('cart-count');
+    const cartSummaryDiv = document.getElementById('cart');
+
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('show'); }
+
+    function addToCart(name, price, isDigital=false) {
+      cart.push({ name, price, isDigital });
+      total += price;
+      updateCart();
     }
+
+    function removeItem(index) {
+      if (confirm('Remove this item?')) {
+        total -= cart[index].price;
+        cart.splice(index, 1);
+        updateCart();
+      }
+    }
+
+    function updateCart() {
+      cartItemsDiv.innerHTML = '';
+      cart.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'cart-item';
+        div.innerHTML = `
+          <span>${item.name}</span>
+          <span>Rs. ${item.price} <button class="remove-btn" onclick="removeItem(${index})">x</button></span>
+        `;
+        cartItemsDiv.appendChild(div);
+      });
+      cartTotalSpan.textContent = total;
+      cartCountDiv.textContent = cart.length;
+      cartSummaryDiv.style.display = cart.length > 0 ? 'block' : 'none';
+
+      const checkoutBar = document.getElementById('checkout-bar');
+      if (cart.length > 0) {
+        checkoutBar.style.display = 'flex';
+        document.getElementById('sticky-total').textContent = total;
+      } else {
+        checkoutBar.style.display = 'none';
+      }
+    }
+
+    function scrollToCart() {
+      if (cart.length > 0) {
+        cartSummaryDiv.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        alert('Your cart is empty.');
+      }
+    }
+
+    function openCheckout(){
+      if(cart.length === 0){ alert('Your cart is empty.'); return; }
+      document.getElementById('checkout-items').innerHTML = cart.map(i=>`• ${i.name} — Rs. ${i.price}`).join('<br>');
+      document.getElementById('checkout-total').textContent = total;
+      document.getElementById('checkoutModal').classList.add('open');
+    }
+    function closeCheckout(){ document.getElementById('checkoutModal').classList.remove('open'); }
+
+    // =====================
+    //  AUTH
+    // =====================
+    auth.onAuthStateChanged(u => {
+      currentUser = u;
+      const authState = document.getElementById('authState');
+      const signBtn = document.getElementById('signBtn');
+      const merchantLine = document.getElementById('merchantLine');
+      const userBox = document.getElementById('userBox');
+      if(u){
+        authState.innerHTML = `Signed in as <strong>${u.displayName || u.email}</strong>`;
+        signBtn.textContent = 'Sign out';
+        signBtn.onclick = () => auth.signOut();
+        userBox.style.display = 'inline-flex';
+        userBox.textContent = `Buyer: ${u.email}`;
+        // Show your public payment details here
+        merchantLine.innerHTML = 'Easypaisa/JazzCash: <strong>03XX-XXXXXXX</strong> (Tech Guide by Abir)';
+        // Prefill buyer email
+        document.getElementById('buyerEmail').value = u.email || '';
+      } else {
+        authState.textContent = 'Not signed in';
+        signBtn.textContent = 'Sign in with Google';
+        signBtn.onclick = signInWithGoogle;
+        userBox.style.display = 'none';
+        merchantLine.textContent = 'Account will show after Sign‑In';
+        document.getElementById('buyerEmail').value = '';
+      }
+    });
+
+    function signInWithGoogle(){
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider).catch(err=>alert(err.message));
+    }
+
+    // =====================
+    //  VERIFY & UNLOCK (MVP)
+    //  This flow stores an order in Firestore and reveals download links.
+    //  Replace the file URLs with your Firebase Storage "alt=media" links.
+    // =====================
+    async function verifyAndUnlock(){
+      if(!currentUser){ alert('Please sign in first.'); return; }
+      if(cart.length === 0){ alert('Your cart is empty.'); return; }
+
+      const txnId = (document.getElementById('txnId').value||'').trim();
+      const buyerEmail = (document.getElementById('buyerEmail').value||'').trim();
+      if(txnId.length < 6){ alert('Enter a valid Transaction ID.'); return; }
+
+      const order = {
+        uid: currentUser.uid,
+        email: buyerEmail || currentUser.email,
+        items: cart,
+        total,
+        payMethod: document.getElementById('payMethod').value,
+        txnId,
+        status: 'paid', // In production, set 'pending' and approve via Admin.
+        createdAt: new Date().toISOString(),
+      };
+
+      try{
+        await db.collection('orders').add(order);
+      }catch(e){
+        console.error(e);
+        alert('Could not save order. Check Firestore rules.');
+        return;
+      }
+
+      // Clear cart
+      cart = []; total = 0; updateCart();
+
+      // Reveal download links
+      const files = getDownloadFilesFromItems(order.items);
+      const list = document.getElementById('downloadList');
+      list.innerHTML = '';
+      files.forEach(f => {
+        const li = document.createElement('li');
+        li.innerHTML = `<a href="${f.url}" target="_blank" rel="noopener">${f.label}</a>`;
+        list.appendChild(li);
+      });
+      document.getElementById('unlockBox').style.display = 'block';
+      alert('Payment marked as successful. Downloads unlocked!');
+    }
+
+    // Map items to files (Replace URLs with your Firebase Storage links)
+    function getDownloadFilesFromItems(items){
+      const out = [];
+      const hasPromptPack = items.some(i => i.isDigital && i.name.toLowerCase().includes('prompt'));
+      if(hasPromptPack){
+        out.push({ label: 'Prompt Power Pack (PDF)', url: 'https://firebasestorage.googleapis.com/v0/b/YOUR_PROJECT.appspot.com/o/packs%2Fprompt-pack.pdf?alt=media' });
+        out.push({ label: 'Bonus: 50 Free AI Tools (PDF)', url: 'https://firebasestorage.googleapis.com/v0/b/YOUR_PROJECT.appspot.com/o/packs%2F50-ai-tools.pdf?alt=media' });
+      }
+      // Add mappings for future digital products here
+      return out;
+    }
+
+    // Init
+    updateCart();
   </script>
 </body>
 </html>
