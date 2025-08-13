@@ -216,187 +216,187 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
   <script>
-    // =====================
-    //  FIREBASE CONFIG
-    //  Replace with your v8 (compat) config from Firebase console
-    // =====================
-    
-    
-    const firebaseConfig = {
-      apiKey: "AIzaSyAgCulSOvdbYZdLNUjBCxN_1rfttwQ_Rv4",
-      authDomain: "tech-store-1943d.firebaseapp.com",
-      projectId: "tech-store-1943d",
-      // If you also want Storage links, add storageBucket too
-      storageBucket: "tech-store-1943d.firebasestorage.app",
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+   // =====================
+//  FIREBASE CONFIG
+// =====================
+const firebaseConfig = {
+  apiKey: "AIzaSyAgCulSOvdbYZdLNUjBCxN_1rfttwQ_Rv4",
+  authDomain: "tech-store-1943d.firebaseapp.com",
+  projectId: "tech-store-1943d",
+  storageBucket: "tech-store-1943d.firebasestorage.app",
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-    // =====================
-    //  APP STATE
-    // =====================
-    let cart = []; // {name, price, isDigital}
-    let total = 0;
-    let currentUser = null;
+// =====================
+//  APP STATE
+// =====================
+let cart = []; // {name, price, isDigital}
+let total = 0;
+let currentUser = null;
 
-    const cartItemsDiv = document.getElementById('cart-items');
-    const cartTotalSpan = document.getElementById('cart-total');
-    const cartCountDiv = document.getElementById('cart-count');
-    const cartSummaryDiv = document.getElementById('cart');
+const cartItemsDiv = document.getElementById('cart-items');
+const cartTotalSpan = document.getElementById('cart-total');
+const cartCountDiv = document.getElementById('cart-count');
+const cartSummaryDiv = document.getElementById('cart');
 
-    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('show'); }
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('show'); }
 
-    function addToCart(name, price, isDigital=false) {
-      cart.push({ name, price, isDigital });
-      total += price;
-      updateCart();
-    }
+function addToCart(name, price, isDigital=false) {
+  cart.push({ name, price, isDigital });
+  total += price;
+  updateCart();
+}
 
-    function removeItem(index) {
-      if (confirm('Remove this item?')) {
-        total -= cart[index].price;
-        cart.splice(index, 1);
-        updateCart();
-      }
-    }
-
-    function updateCart() {
-      cartItemsDiv.innerHTML = '';
-      cart.forEach((item, index) => {
-        const div = document.createElement('div');
-        div.className = 'cart-item';
-        div.innerHTML = `
-          <span>${item.name}</span>
-          <span>Rs. ${item.price} <button class="remove-btn" onclick="removeItem(${index})">x</button></span>
-        `;
-        cartItemsDiv.appendChild(div);
-      });
-      cartTotalSpan.textContent = total;
-      cartCountDiv.textContent = cart.length;
-      cartSummaryDiv.style.display = cart.length > 0 ? 'block' : 'none';
-
-      const checkoutBar = document.getElementById('checkout-bar');
-      if (cart.length > 0) {
-        checkoutBar.style.display = 'flex';
-        document.getElementById('sticky-total').textContent = total;
-      } else {
-        checkoutBar.style.display = 'none';
-      }
-    }
-
-    function scrollToCart() {
-      if (cart.length > 0) {
-        cartSummaryDiv.scrollIntoView({ behavior: 'smooth' });
-      } else {
-        alert('Your cart is empty.');
-      }
-    }
-
-    function openCheckout(){
-      if(cart.length === 0){ alert('Your cart is empty.'); return; }
-      document.getElementById('checkout-items').innerHTML = cart.map(i=>`• ${i.name} — Rs. ${i.price}`).join('<br>');
-      document.getElementById('checkout-total').textContent = total;
-      document.getElementById('checkoutModal').classList.add('open');
-    }
-    function closeCheckout(){ document.getElementById('checkoutModal').classList.remove('open'); }
-
-    // =====================
-    //  AUTH
-    // =====================
-    auth.onAuthStateChanged(u => {
-      currentUser = u;
-      const authState = document.getElementById('authState');
-      const signBtn = document.getElementById('signBtn');
-      const merchantLine = document.getElementById('merchantLine');
-      const userBox = document.getElementById('userBox');
-      if(u){
-        authState.innerHTML = `Signed in as <strong>${u.displayName || u.email}</strong>`;
-        signBtn.textContent = 'Sign out';
-        signBtn.onclick = () => auth.signOut();
-        userBox.style.display = 'inline-flex';
-        userBox.textContent = `Buyer: ${u.email}`;
-        // Show your public payment details here
-        merchantLine.innerHTML = 'Easypaisa/JazzCash: <strong>03XX-XXXXXXX</strong> (Tech Guide by Abir)';
-        // Prefill buyer email
-        document.getElementById('buyerEmail').value = u.email || '';
-      } else {
-        authState.textContent = 'Not signed in';
-        signBtn.textContent = 'Sign in with Google';
-        signBtn.onclick = signInWithGoogle;
-        userBox.style.display = 'none';
-        merchantLine.textContent = 'Account will show after Sign‑In';
-        document.getElementById('buyerEmail').value = '';
-      }
-    });
-
-    function signInWithGoogle(){
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider).catch(err=>alert(err.message));
-    }
-
-    // =====================
-    //  VERIFY & UNLOCK (MVP)
-    //  This flow stores an order in Firestore and reveals download links.
-    //  Replace the file URLs with your Firebase Storage "alt=media" links.
-    // =====================
-    async function verifyAndUnlock(){
-      if(!currentUser){ alert('Please sign in first.'); return; }
-      if(cart.length === 0){ alert('Your cart is empty.'); return; }
-
-      const txnId = (document.getElementById('txnId').value||'').trim();
-      const buyerEmail = (document.getElementById('buyerEmail').value||'').trim();
-      if(txnId.length < 6){ alert('Enter a valid Transaction ID.'); return; }
-
-      const order = {
-        uid: currentUser.uid,
-        email: buyerEmail || currentUser.email,
-        items: cart,
-        total,
-        payMethod: document.getElementById('payMethod').value,
-        txnId,
-        status: 'paid', // In production, set 'pending' and approve via Admin.
-        createdAt: new Date().toISOString(),
-      };
-
-      try{
-        await db.collection('orders').add(order);
-      }catch(e){
-        console.error(e);
-        alert('Could not save order. Check Firestore rules.');
-        return;
-      }
-
-      // Clear cart
-      cart = []; total = 0; updateCart();
-
-      // Reveal download links
-      const files = getDownloadFilesFromItems(order.items);
-      const list = document.getElementById('downloadList');
-      list.innerHTML = '';
-      files.forEach(f => {
-        const li = document.createElement('li');
-        li.innerHTML = `<a href="${f.url}" target="_blank" rel="noopener">${f.label}</a>`;
-        list.appendChild(li);
-      });
-      document.getElementById('unlockBox').style.display = 'block';
-      alert('Payment marked as successful. Downloads unlocked!');
-    }
-
-    // Map items to files (Replace URLs with your Firebase Storage links)
-    function getDownloadFilesFromItems(items){
-      const out = [];
-      const hasPromptPack = items.some(i => i.isDigital && i.name.toLowerCase().includes('prompt'));
-      if(hasPromptPack){
-        out.push({ label: 'Prompt Power Pack (PDF)', url: 'https://firebasestorage.googleapis.com/v0/b/YOUR_PROJECT.appspot.com/o/packs%2Fprompt-pack.pdf?alt=media' });
-        out.push({ label: 'Bonus: 50 Free AI Tools (PDF)', url: 'https://firebasestorage.googleapis.com/v0/b/YOUR_PROJECT.appspot.com/o/packs%2F50-ai-tools.pdf?alt=media' });
-      }
-      // Add mappings for future digital products here
-      return out;
-    }
-
-    // Init
+function removeItem(index) {
+  if (confirm('Remove this item?')) {
+    total -= cart[index].price;
+    cart.splice(index, 1);
     updateCart();
+  }
+}
+
+function updateCart() {
+  cartItemsDiv.innerHTML = '';
+  cart.forEach((item, index) => {
+    const div = document.createElement('div');
+    div.className = 'cart-item';
+    div.innerHTML = `
+      <span>${item.name}</span>
+      <span>Rs. ${item.price} <button class="remove-btn" onclick="removeItem(${index})">x</button></span>
+    `;
+    cartItemsDiv.appendChild(div);
+  });
+  cartTotalSpan.textContent = total;
+  cartCountDiv.textContent = cart.length;
+  cartSummaryDiv.style.display = cart.length > 0 ? 'block' : 'none';
+
+  const checkoutBar = document.getElementById('checkout-bar');
+  if (cart.length > 0) {
+    checkoutBar.style.display = 'flex';
+    document.getElementById('sticky-total').textContent = total;
+  } else {
+    checkoutBar.style.display = 'none';
+  }
+}
+
+function scrollToCart() {
+  if (cart.length > 0) {
+    cartSummaryDiv.scrollIntoView({ behavior: 'smooth' });
+  } else {
+    alert('Your cart is empty.');
+  }
+}
+
+function openCheckout(){
+  if(cart.length === 0){ alert('Your cart is empty.'); return; }
+  document.getElementById('checkout-items').innerHTML = cart.map(i=>`• ${i.name} — Rs. ${i.price}`).join('<br>');
+  document.getElementById('checkout-total').textContent = total;
+  document.getElementById('checkoutModal').classList.add('open');
+}
+function closeCheckout(){ document.getElementById('checkoutModal').classList.remove('open'); }
+
+// =====================
+//  AUTH
+// =====================
+auth.onAuthStateChanged(u => {
+  currentUser = u;
+  const authState = document.getElementById('authState');
+  const signBtn = document.getElementById('signBtn');
+  const merchantLine = document.getElementById('merchantLine');
+  const userBox = document.getElementById('userBox');
+  if(u){
+    authState.innerHTML = `Signed in as <strong>${u.displayName || u.email}</strong>`;
+    signBtn.textContent = 'Sign out';
+    signBtn.onclick = () => auth.signOut();
+    userBox.style.display = 'inline-flex';
+    userBox.textContent = `Buyer: ${u.email}`;
+    merchantLine.innerHTML = 'Easypaisa/JazzCash: <strong>03XX-XXXXXXX</strong> (Tech Guide by Abir)';
+    document.getElementById('buyerEmail').value = u.email || '';
+  } else {
+    authState.textContent = 'Not signed in';
+    signBtn.textContent = 'Sign in with Google';
+    signBtn.onclick = signInWithGoogle;
+    userBox.style.display = 'none';
+    merchantLine.textContent = 'Account will show after Sign‑In';
+    document.getElementById('buyerEmail').value = '';
+  }
+});
+
+function signInWithGoogle(){
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).catch(err=>alert(err.message));
+}
+
+// =====================
+//  VERIFY & UNLOCK
+// =====================
+async function verifyAndUnlock(){
+  if(!currentUser){ alert('Please sign in first.'); return; }
+  if(cart.length === 0){ alert('Your cart is empty.'); return; }
+
+  const txnId = (document.getElementById('txnId').value||'').trim();
+  const buyerEmail = (document.getElementById('buyerEmail').value||currentUser.email).trim();
+  const payMethod = document.getElementById('payMethod').value;
+
+  if(txnId.length < 6){ alert('Enter a valid Transaction ID.'); return; }
+
+  // Prepare order object
+  const order = {
+    uid: currentUser.uid,
+    email: buyerEmail,
+    items: cart.map(i=>({ name:i.name, price:i.price, isDigital:i.isDigital })),
+    total,
+    payMethod,
+    txnId,
+    status: 'paid', // set 'pending' if you want admin verification
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+  };
+
+  try{
+    await db.collection('orders').add(order);
+  } catch(e){
+    console.error(e);
+    alert('Could not save order. Check Firestore rules.');
+    return;
+  }
+
+  // Clear cart
+  cart = []; total = 0; updateCart();
+
+  // Reveal download links
+  const list = document.getElementById('downloadList');
+  list.innerHTML = '';
+  getDownloadFilesFromItems(order.items).forEach(f=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<a href="${f.url}" target="_blank" rel="noopener">${f.label}</a>`;
+    list.appendChild(li);
+  });
+  document.getElementById('unlockBox').style.display = 'block';
+  alert('Payment marked as successful. Downloads unlocked!');
+}
+
+// =====================
+//  Digital Product Mapping
+// =====================
+function getDownloadFilesFromItems(items){
+  const out = [];
+  const hasPromptPack = items.some(i => i.isDigital && i.name.toLowerCase().includes('prompt'));
+  if(hasPromptPack){
+    out.push({ label: 'Prompt Power Pack (PDF)', url: 'https://firebasestorage.googleapis.com/v0/b/YOUR_PROJECT.appspot.com/o/packs%2Fprompt-pack.pdf?alt=media' });
+    out.push({ label: 'Bonus: 50 Free AI Tools (PDF)', url: 'https://firebasestorage.googleapis.com/v0/b/YOUR_PROJECT.appspot.com/o/packs%2F50-ai-tools.pdf?alt=media' });
+  }
+  // Add future digital products here
+  return out;
+}
+
+// =====================
+//  INIT
+// =====================
+updateCart();
+
   </script>
 </body>
 </html>
+
